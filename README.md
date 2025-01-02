@@ -115,22 +115,68 @@ Pre projekt bol navrhnutý multi-dimenzionálny model typu hviezda. Tento model 
 - Príkaz:
   ```sql
   CREATE OR REPLACE STAGE movielens_stage;
-### 3.2 Výsledky analýzy
-- Top 10 filmov s najvyšším hodnotením:
-  ```sql
-  SELECT 
+# Analýza Databázy Filmov
+
+## 3.2 Výsledky analýzy
+
+### Top 10 filmov s najvyšším hodnotením
+
+Nasledujúci SQL dotaz zobrazuje desať filmov s najvyšším priemerným hodnotením. Tento dotaz pomáha identifikovať najpopulárnejšie filmy v našej databáze na základe používateľských hodnotení.
+
+```sql
+SELECT 
     m.title,
     mar.avg_rating,
     mar.total_ratings
-  FROM movie_avg_ratings mar
-  JOIN movies m ON mar.movie_id = m.id
-  ORDER BY mar.avg_rating DESC
-  LIMIT 10;
-- Top 10 žánrov podľa počtu filmov:
-  ```sql
-  SELECT * FROM genre_movie_count
-  ORDER BY total_movies DESC
-  LIMIT 10;
+FROM movie_avg_ratings mar
+JOIN movies m ON mar.movie_id = m.id
+ORDER BY mar.avg_rating DESC
+LIMIT 10;
+```
+
+### Top 10 žánrov podľa počtu filmov
+
+Nasledujúci SQL dotaz ukazuje desať žánrov s najväčším počtom filmov v databáze. Tento prehľad pomáha pochopiť, ktoré žánry sú najpopulárnejšie.
+
+```sql
+SELECT 
+    g.name AS genre_name,
+    COUNT(gm.movie_id) AS total_movies
+FROM genres g
+JOIN genres_movies gm ON g.id = gm.genre_id
+GROUP BY g.name
+ORDER BY total_movies DESC
+LIMIT 10;
+```
+
+### Top 10 užívateľov podľa počtu hodnotení
+
+Tento dotaz identifikuje desať užívateľov, ktorí poskytli najviac hodnotení, čo môže byť užitočné na posúdenie úrovne užívateľskej aktivity a zapojenia do hodnotiaceho procesu.
+
+```sql
+SELECT 
+    u.id AS user_id,
+    COUNT(r.id) AS total_ratings
+FROM ratings r
+JOIN users u ON r.user_id = u.id
+GROUP BY u.id
+ORDER BY total_ratings DESC
+LIMIT 10;
+```
+
+### Počet filmov vydaných každý rok
+
+Nasledujúci dotaz poskytuje prehľad o počte filmov vydaných každý rok, čo umožňuje sledovať trendy vo filme produkcie a ich dynamiku cez čas.
+
+```sql
+SELECT 
+    release_year,
+    COUNT(*) AS total_movies
+FROM movies
+GROUP BY release_year
+ORDER BY release_year ASC;
+```
+
 ### 3.3 Vizualizácie
 * Navrhnite vizualizácie, ktoré ukazujú:
 - Priemerné hodnotenia filmov.
