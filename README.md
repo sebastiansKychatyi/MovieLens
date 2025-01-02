@@ -21,13 +21,13 @@ Databáza obsahuje štruktúrované dáta vrátane číselných, textových a č
 - Popis: Kategórie vekových skupín používateľov.
 - Stĺpce:
   - id: Unikátny identifikátor vekovej skupiny.
-  - name: Názov vekovej skupiny (napr. "18-24").
+  - name: Názov vekovej skupiny.
 
 #### occupations
 - Popis: Zoznam povolaní používateľov.
 - Stĺpce:
   - id: Unikátny identifikátor povolania.
-  - name: Názov povolania (napr. "inžinier").
+  - name: Názov povolania.
 
 #### users
 - Popis: Informácie o používateľoch.
@@ -59,7 +59,7 @@ Databáza obsahuje štruktúrované dáta vrátane číselných, textových a č
 - Popis: Žánre filmov.
 - Stĺpce:
   - id: Unikátny identifikátor žánru.
-  - name: Názov žánru (napr. "komédia").
+  - name: Názov žánru.
 
 #### genres_movies
 - Popis: Prepojenie medzi filmami a ich žánrami.
