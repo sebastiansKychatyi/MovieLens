@@ -111,41 +111,23 @@ Pre projekt bol navrhnutý multi-dimenzionálny model typu hviezda. Tento model 
 
 ### 3.1 Príprava a import dát
 #### 1. Extract (Extrahovanie dát)
-- Dátové súbory vo formáte CSV boli nahrané do Snowflake pomocou STAGE.
-- Príkaz:
+- Týmto príkazom hovoríme, že používame databázu GECKO_DB a schému MOVIELENS:
   ```sql
   USE DATABASE GECKO_DB;
   USE SCHEMA GECKO_DB.MOVIELENS;
-
-  CREATE OR REPLACE STAGE movielens_stage;
- 
+  ```
+  ```sql
+  CREATE OR REPLACE STAGE age_group_staging;
+  ```
+  - Importovanie dat
+  ```sql
   COPY INTO age_group
   FROM @movielens_stage/age_group.csv
   FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
-
-  COPY INTO users
-  FROM @movielens_stage/users.csv
-  FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
-
-  COPY INTO tags
-  FROM @movielens_stage/tags.csv
-  FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
-
-  COPY INTO ratings
-  FROM @movielens_stage/ratings.csv
-  FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
-
-  COPY INTO movies
-  FROM @movielens_stage/movies.csv
-  FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
-
-  COPY INTO genres
-  FROM @movielens_stage/genres.csv
-  FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
-
-  COPY INTO genres_movies
-  FROM @movielens_stage/genres_movies.csv
-  FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
+  ```
+  - Overenie spravnosti operacii
+  ```sql
+  SELECT * FROM age_group_staging;
   ```
 
 # Analýza Databázy Filmov
