@@ -1,4 +1,4 @@
-С, [2. 1. 2025 20:27]
+
 # ETL Proces pre databázu MovieLens
 
 ## 1. Úvod a popis zdrojových dát
