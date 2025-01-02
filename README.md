@@ -206,7 +206,8 @@ V tejto sekcii projektu sa zameriavame na prezentáciu vizuálnych analýz, ktor
 Popis: Graf zobrazuje priemerné hodnotenia pre top hodnotené filmy.  
 Účel: Identifikuje filmy s najvyššími hodnoteniam!
 i, čo môže pomôcť pri odporúčaniach pre používateľov alebo pri analýze kvality filmových obsahov.
-[graf_1](https://github.com/user-attachments/assets/2e77c44a-9503-40ea-a6d1-286d74b7c483)
+![graf_1](https://github.com/user-attachments/assets/44d416b2-509e-491b-a39a-564595e5c478)
+
 
 ### 4.2 Počet filmov podľa žánrov
 Popis: Tento graf prezentuje rozdelenie filmov podľa žánrov.  
