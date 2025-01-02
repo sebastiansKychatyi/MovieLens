@@ -116,6 +116,7 @@ Pre projekt bol navrhnutý multi-dimenzionálny model typu hviezda. Tento model 
   USE DATABASE GECKO_DB;
   USE SCHEMA GECKO_DB.MOVIELENS;
   ```
+  - Vytvorenie
   ```sql
   CREATE OR REPLACE STAGE age_group_staging;
   ```
