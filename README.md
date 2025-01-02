@@ -138,34 +138,37 @@ Pre projekt bol navrhnutý multi-dimenzionálny model typu hviezda. Tento model 
 - Preferencie používateľov podľa vekových skupín.
 ## 4. Vizualizácia dát
 
-С, [2. 1. 2025 20:27]
 V tejto sekcii projektu sa zameriavame na prezentáciu vizuálnych analýz, ktoré poskytujú hlbšie pochopenie údajov o filmoch a používateľoch z databázy MovieLens. Vizualizácie sú navrhnuté tak, aby odpovedali na kľúčové otázky a odhalili zaujímavé trendy a vzorce v dátach.
 
 ### 4.1 Priemerné hodnotenia filmov
 Popis: Graf zobrazuje priemerné hodnotenia pre top hodnotené filmy.  
-Účel: Identifikuje filmy s najvyššími hodnoteniami, čo môže pomôcť pri odporúčaniach pre používateľov alebo pri analýze kvality filmových obsahov.
+Účel: Identifikuje filmy s najvyššími hodnoteniam!
+i, čo môže pomôcť pri odporúčaniach pre používateľov alebo pri analýze kvality filmových obsahov.
+[graf_1](https://github.com/user-attachments/assets/2e77c44a-9503-40ea-a6d1-286d74b7c483)
 
 ### 4.2 Počet filmov podľa žánrov
 Popis: Tento graf prezentuje rozdelenie filmov podľa žánrov.  
 Účel: Poskytuje prehľad o popularite jednotlivých žánrov, čo môže byť užitočné pre filmové distribučné spoločnosti alebo marketérov.
+![graf_2](https://github.com/user-attachments/assets/f77646f6-16b9-4a71-aca3-bf506b247a94)
+
 
 ### 4.3 Rozloženie hodnotení filmov
 Popis: Zobrazuje distribúciu hodnotení medzi používateľmi.  
 Účel: Analyzuje ako používatelia hodnotia filmy a môže odhaliť prípadnú prísťnosť alebo štedrosť v ich hodnoteniach.
+![graf_3](https://github.com/user-attachments/assets/4e5b26f4-2f43-4f83-a14b-94a446c94dd0)
 
 ### 4.4 Počet hodnotení podľa vekových skupín
 Popis: Graf ukazuje počet hodnotení podľa vekových skupín používateľov.  
 Účel: Skúma, ako vekové rozdiely ovplyvňujú filmové preferencie a hodnotenie.
+![graf_4](https://github.com/user-attachments/assets/4027f690-c91d-4261-94d3-9c77261d5751)
+
 
 ### 4.5 Historický vývoj počtu filmov
 Popis: Tento graf ilustruje trend v počte vydaných filmov počas rôznych rokov.  
 Účel: Umožňuje sledovať ako sa kinematografia vyvíjala v čase a reaguje na zmeny v kultúrnych a technologických trendoch.
+![graf_5](https://github.com/user-attachments/assets/1dc051fd-356c-49e6-a5d3-20ac5771c776)
+
 
 ### Náhľady vizualizácií
-Pre lepšiu predstavivosť sú tu príklady vizualizácií vygenerovaných z našich analytických procesov:
+![5_grafikov](https://github.com/user-attachments/assets/89689c63-84d7-4af7-8b0d-83b370f421a7)
 
-![Priemerné hodnotenia filmov](https://github.com/sebastiansKychatyi/MovieLens-ETL-Process/blob/main/images/average_ratings.png)
-![Počet filmov podľa žánrov](https://github.com/sebastiansKychatyi/MovieLens-ETL-Process/blob/main/images/movie_counts_by_genre.png)
-![Rozloženie hodnotení filmov](https://github.com/sebastiansKychatyi/MovieLens-ETL-Process/blob/main/images/rating_distribution.png)
-![Počet hodnotení podľa vekových skupín](https://github.com/sebastiansKychatyi/MovieLens-ETL-Process/blob/main/images/ratings_by_age_group.png)
-![Historický vývoj počtu filmov](https://github.com/sebastiansKychatyi/MovieLens-ETL-Process/blob/main/images/historical_movie_trends.png)
