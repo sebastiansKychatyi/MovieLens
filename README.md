@@ -217,6 +217,47 @@ DROP TABLE IF EXISTS USERS_STAGING;
 
 ---
 
-Tento proces efektívne pripravil dáta na analýzu a následné vizualizácie, čím umožnil hlbšie porozumenie dát a podnikovým rozhodovacím procesom. Snowflake svojou flexibilitou a jednoduchosťou výrazne uľahčil celý postup.
+### 4. Vizualizácia dát
+
+Vizualizácia dát je dôležitou súčasťou analýzy, pretože umožňuje lepšie pochopiť trendy a súvislosti medzi údajmi. Pre tento projekt boli použité nasledujúce SQL dotazy, ktoré generovali dáta pre grafické zobrazenia:
+
+#### 4.1 Analýza hodnotení filmov
+
+```sql
+SELECT movieId, AVG(rating) AS avg_rating, COUNT(*) AS num_ratings
+FROM FACT_RATINGS
+GROUP BY movieId
+ORDER BY avg_rating DESC;
+```
+
+**Vysvetlenie:** Tento dotaz poskytuje priemerné hodnotenie a počet hodnotení pre každý film. Na grafe je možné vidieť, ktoré filmy majú najvyššie hodnotenia a zároveň ich popularitu (počet hodnotení).
+
+#### 4.2 Aktivita používateľov podľa času
+
+```sql
+SELECT DATE(RATED_AT) AS rating_date, COUNT(*) AS num_ratings
+FROM FACT_RATINGS
+GROUP BY rating_date
+ORDER BY rating_date;
+```
+
+**Vysvetlenie:** Tento dotaz ukazuje počet hodnotení uskutočnených používateľmi v jednotlivých dňoch. Graf môže zobrazovať trendy v čase, ako napríklad dni s najväčšou aktivitou používateľov.
+
+#### 4.3 Distribúcia hodnotení
+
+```sql
+SELECT rating, COUNT(*) AS num_ratings
+FROM FACT_RATINGS
+GROUP BY rating
+ORDER BY rating;
+```
+
+**Vysvetlenie:** Tento dotaz poskytuje distribúciu hodnotení. Na grafe je možné vidieť, ako často boli jednotlivé hodnotenia (napríklad 1 hviezdička, 5 hviezdičiek) udeľované používateľmi.
+
+---
+
+Grafy vytvorené na základe týchto dotazov vizualizujú dôležité aspekty dát a poskytujú užitočné informácie pre ďalšiu analýzu. **Priložené grafy:**
+
+
 
 
