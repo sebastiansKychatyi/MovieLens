@@ -106,132 +106,117 @@ Pre projekt bol navrhnutý multi-dimenzionálny model typu hviezda. Tento model 
 ![Dimenzionálny model ERD](https://github.com/user-attachments/assets/cfcf6cb7-98c7-4b2e-87dc-cb67daa4f8d6)
 
 ---
+### 3. ETL proces v Snowflake
 
-## 3. ETL proces v Snowflake
+ETL proces (Extract, Transform, Load) je kľúčovou súčasťou dátovej integrácie, pričom sa zameriava na extrakciu dát zo zdrojových systémov, ich transformáciu podľa potreby a následné načítanie do cieľovej databázy. V tomto prípade bol proces implementovaný v platforme Snowflake s cieľom pripraviť zdrojové dáta z vrstvy staging na použitie v dimenzionálnom modeli. Tento model umožňuje analýzu a vizualizáciu dát.
 
-### 3.1 Príprava a import dát
-#### 1. Extract (Extrahovanie dát)
-- Týmto príkazom hovoríme, že používame databázu GECKO_DB a schému MOVIELENS:
-  ```sql
-  USE DATABASE GECKO_DB;
-  USE SCHEMA GECKO_DB.MOVIELENS;
-  ```
-  - Vytvorenie
-  ```sql
-  CREATE OR REPLACE STAGE age_group_staging;
-  ```
-  - Importovanie dat
-  ```sql
-  COPY INTO age_group
-  FROM @movielens_stage/age_group.csv
-  FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
-  ```
-  - Overenie spravnosti operacii
-  ```sql
-  SELECT * FROM age_group_staging;
-  ```
+#### 3.1 Extrahovanie dát (Extract)
 
-# Analýza Databázy Filmov
-
-## 3.2 Výsledky analýzy
-
-### Top 10 filmov s najvyšším hodnotením
-
-Nasledujúci SQL dotaz zobrazuje desať filmov s najvyšším priemerným hodnotením. Tento dotaz pomáha identifikovať najpopulárnejšie filmy v našej databáze na základe používateľských hodnotení.
+Proces začal nahrávaním zdrojových dát vo formáte `.csv` do interného stage nazvaného `my_stage`. Na vytvorenie stage sa použil nasledujúci SQL príkaz:
 
 ```sql
-SELECT 
-    m.title,
-    mar.avg_rating,
-    mar.total_ratings
-FROM movie_avg_ratings mar
-JOIN movies m ON mar.movie_id = m.id
-ORDER BY mar.avg_rating DESC
-LIMIT 10;
+CREATE OR REPLACE STAGE my_stage 
+FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"');
 ```
 
-### Top 10 žánrov podľa počtu filmov
+Po vytvorení stage sa obsah každého `.csv` súboru načítal do staging tabuliek. Napríklad pre tabuľku `ratings_staging` bol postup nasledujúci:
 
-Nasledujúci SQL dotaz ukazuje desať žánrov s najväčším počtom filmov v databáze. Tento prehľad pomáha pochopiť, ktoré žánry sú najpopulárnejšie.
+1. **Vytvorenie tabuľky**:
 
 ```sql
-SELECT 
-    g.name AS genre_name,
-    COUNT(gm.movie_id) AS total_movies
-FROM genres g
-JOIN genres_movies gm ON g.id = gm.genre_id
-GROUP BY g.name
-ORDER BY total_movies DESC
-LIMIT 10;
+CREATE OR REPLACE TABLE ratings_staging (
+    id INT,
+    userId INT,
+    movieId INT,
+    rating FLOAT,
+    timestamp STRING
+);
 ```
 
-### Top 10 užívateľov podľa počtu hodnotení
+2. **Nahranie dát**:
 
-Tento dotaz identifikuje desať užívateľov, ktorí poskytli najviac hodnotení, čo môže byť užitočné na posúdenie úrovne užívateľskej aktivity a zapojenia do hodnotiaceho procesu.
+Dáta boli importované príkazom:
 
 ```sql
-SELECT 
-    u.id AS user_id,
-    COUNT(r.id) AS total_ratings
-FROM ratings r
-JOIN users u ON r.user_id = u.id
-GROUP BY u.id
-ORDER BY total_ratings DESC
-LIMIT 10;
+COPY INTO ratings_staging
+FROM @my_stage/ratings.csv
+FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
 ```
 
-### Počet filmov vydaných každý rok
+3. **Overenie správnosti operácií**:
 
-Nasledujúci dotaz poskytuje prehľad o počte filmov vydaných každý rok, čo umožňuje sledovať trendy vo filme produkcie a ich dynamiku cez čas.
+Správnosť nahraných dát sa overovala dvoma spôsobmi:
+- SQL dotazom, napríklad:  
+  ```sql
+  SELECT * FROM ratings_staging;
+  ```
+- Použitím Snowflake rozhrania: kliknutím na **Data > Databases > Tables > Tabuľka > Data Preview**, kde je možné prezerať obsah tabuľky. Navyše, v časti **Copy History** je zobrazený stav importovania súboru spolu s informáciou o úspešnosti operácie.
+
+---
+
+#### 3.2 Transformácia dát (Transform)
+
+Transformácia zahŕňala prispôsobenie dát pre potreby dimenzionálneho modelovania. Nižšie sú uvedené príklady transformácií:
+
+1. **Unifikácia údajov v dimenzionálnych tabuľkách**:
+
+Príklad pre vytvorenie tabuľky dimenzie používateľov `DIM_USERS`:
 
 ```sql
+INSERT INTO DIM_USERS (USER_ID, AGE_GROUP_ID, GENDER, OCCUPATION_ID)
 SELECT 
-    release_year,
-    COUNT(*) AS total_movies
-FROM movies
-GROUP BY release_year
-ORDER BY release_year ASC;
+    us.USER_ID,                  
+    ag.ID AS AGE_GROUP_ID,       
+    us.GENDER,                   
+    os.ID AS OCCUPATION_ID       
+FROM USERS_STAGING us
+LEFT JOIN AGE_GROUP_STAGING ag
+    ON us.AGE >= ag.ID AND us.AGE < ag.ID + 6  
+LEFT JOIN OCCUPATIONS_STAGING os
+    ON us.OCCUPATION_ID = os.ID; 
 ```
 
-### 3.3 Vizualizácie
-* Navrhnite vizualizácie, ktoré ukazujú:
-- Priemerné hodnotenia filmov.
-- Počet filmov podľa žánrov.
-- Preferencie používateľov podľa vekových skupín.
-## 4. Vizualizácia dát
+2. **Načítanie faktov do faktovej tabuľky `FACT_RATINGS`**:
 
-V tejto sekcii projektu sa zameriavame na prezentáciu vizuálnych analýz, ktoré poskytujú hlbšie pochopenie údajov o filmoch a používateľoch z databázy MovieLens. Vizualizácie sú navrhnuté tak, aby odpovedali na kľúčové otázky a odhalili zaujímavé trendy a vzorce v dátach.
+```sql
+INSERT INTO FACT_RATINGS (RATING_ID, RATING, RATED_AT, USER_ID, MOVIE_ID, DIM_TIME_TIME_ID)
+SELECT 
+    rs.RATING_ID,                 
+    rs.RATING,                    
+    rs.RATED_AT,                  
+    rs.USER_ID,                   
+    rs.MOVIE_ID,                  
+    dt.TIME_ID                    
+FROM RATINGS_STAGING rs
+LEFT JOIN DIM_TIME dt
+    ON dt.FULL_DATE = DATE(rs.RATED_AT)  
+LEFT JOIN DIM_USERS du
+    ON rs.USER_ID = du.USER_ID           
+LEFT JOIN DIM_MOVIES dm
+    ON rs.MOVIE_ID = dm.MOVIE_ID;
+```
 
-### 4.1 Priemerné hodnotenia filmov
-Popis: Graf zobrazuje priemerné hodnotenia pre top hodnotené filmy.  
-Účel: Identifikuje filmy s najvyššími hodnoteniam!
-i, čo môže pomôcť pri odporúčaniach pre používateľov alebo pri analýze kvality filmových obsahov.
-![graf_1](https://github.com/user-attachments/assets/44d416b2-509e-491b-a39a-564595e5c478)
+---
 
+#### 3.3 Načítanie dát (Load)
 
-### 4.2 Počet filmov podľa žánrov
-Popis: Tento graf prezentuje rozdelenie filmov podľa žánrov.  
-Účel: Poskytuje prehľad o popularite jednotlivých žánrov, čo môže byť užitočné pre filmové distribučné spoločnosti alebo marketérov.
-![graf_2](https://github.com/user-attachments/assets/f77646f6-16b9-4a71-aca3-bf506b247a94)
+Po transformáciách boli dáta načítané do cieľových tabuliek. Pre optimalizáciu procesu boli staging tabuľky po dokončení vymazané, aby sa uvoľnili zdroje. Na to sa použili nasledujúce príkazy:
 
+```sql
+DROP TABLE IF EXISTS AGE_GROUP_STAGING;
+DROP TABLE IF EXISTS BRIDGE_GENRES_MOVIES;
+DROP TABLE IF EXISTS GENRES_STAGING;
+DROP TABLE IF EXISTS MOVIES_GENRES_STAGING;
+DROP TABLE IF EXISTS MOVIES_STAGING;
+DROP TABLE IF EXISTS OCCUPATIONS_STAGING;
+DROP TABLE IF EXISTS RATINGS_RAW_STAGING;
+DROP TABLE IF EXISTS RATINGS_STAGING;
+DROP TABLE IF EXISTS USERS_RAW_STAGING;
+DROP TABLE IF EXISTS USERS_STAGING;
+```
 
-### 4.3 Rozloženie hodnotení filmov
-Popis: Zobrazuje distribúciu hodnotení medzi používateľmi.  
-Účel: Analyzuje ako používatelia hodnotia filmy a môže odhaliť prípadnú prísťnosť alebo štedrosť v ich hodnoteniach.
-![graf_3](https://github.com/user-attachments/assets/4e5b26f4-2f43-4f83-a14b-94a446c94dd0)
+---
 
-### 4.4 Počet hodnotení podľa vekových skupín
-Popis: Graf ukazuje počet hodnotení podľa vekových skupín používateľov.  
-Účel: Skúma, ako vekové rozdiely ovplyvňujú filmové preferencie a hodnotenie.
-![graf_4](https://github.com/user-attachments/assets/4027f690-c91d-4261-94d3-9c77261d5751)
+Tento proces efektívne pripravil dáta na analýzu a následné vizualizácie, čím umožnil hlbšie porozumenie dát a podnikovým rozhodovacím procesom. Snowflake svojou flexibilitou a jednoduchosťou výrazne uľahčil celý postup.
 
-
-### 4.5 Historický vývoj počtu filmov
-Popis: Tento graf ilustruje trend v počte vydaných filmov počas rôznych rokov.  
-Účel: Umožňuje sledovať ako sa kinematografia vyvíjala v čase a reaguje na zmeny v kultúrnych a technologických trendoch.
-![graf_5](https://github.com/user-attachments/assets/1dc051fd-356c-49e6-a5d3-20ac5771c776)
-
-
-### Náhľady vizualizácií
-![5_grafikov](https://github.com/user-attachments/assets/89689c63-84d7-4af7-8b0d-83b370f421a7)
 
