@@ -290,4 +290,6 @@ ORDER BY num_ratings DESC;
 Grafy vytvorené na základe týchto dotazov vizualizujú dôležité aspekty dát a poskytujú užitočné informácie pre ďalšiu analýzu.
 
 
+Sebastian Kychatyi
+
 
