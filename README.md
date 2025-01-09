@@ -229,6 +229,7 @@ FROM FACT_RATINGS
 GROUP BY movieId
 ORDER BY avg_rating DESC;
 ```
+![graf_1](https://github.com/user-attachments/assets/3e663788-67ce-4dcf-b0f3-849da7730426)
 
 **Vysvetlenie:** Tento dotaz poskytuje priemerné hodnotenie a počet hodnotení pre každý film. Na grafe je možné vidieť, ktoré filmy majú najvyššie hodnotenia a zároveň ich popularitu (počet hodnotení).
 
@@ -240,6 +241,7 @@ FROM FACT_RATINGS
 GROUP BY rating_date
 ORDER BY rating_date;
 ```
+![graf_2](https://github.com/user-attachments/assets/f1a97d29-22c0-4268-9fc3-5fba781d2a12)
 
 **Vysvetlenie:** Tento dotaz ukazuje počet hodnotení uskutočnených používateľmi v jednotlivých dňoch. Graf môže zobrazovať trendy v čase, ako napríklad dni s najväčšou aktivitou používateľov.
 
@@ -251,13 +253,41 @@ FROM FACT_RATINGS
 GROUP BY rating
 ORDER BY rating;
 ```
+![graf_3](https://github.com/user-attachments/assets/d9d22c4d-4cab-4b42-8fbf-cf6cb611fd55)
 
 **Vysvetlenie:** Tento dotaz poskytuje distribúciu hodnotení. Na grafe je možné vidieť, ako často boli jednotlivé hodnotenia (napríklad 1 hviezdička, 5 hviezdičiek) udeľované používateľmi.
+
+#### 4.4 Počet hodnotení podľa vekových skupín používateľov
+
+```sql
+SELECT du.AGE_GROUP_ID, COUNT(*) AS num_ratings
+FROM FACT_RATINGS fr
+JOIN DIM_USERS du ON fr.USER_ID = du.USER_ID
+GROUP BY du.AGE_GROUP_ID
+ORDER BY du.AGE_GROUP_ID;
+```
+![graf_4](https://github.com/user-attachments/assets/6d9dee23-f01a-46d0-b11a-90f2ea7facc4)
+
+
+**Vysvetlenie:** Tento dotaz ukazuje, ako sú hodnotenia rozdelené medzi rôzne vekové skupiny používateľov. Graf môže vizualizovať aktivity používateľov podľa veku.
+
+#### 4.5 Popularita žánrov filmov
+
+```sql
+SELECT dm.GENRE, COUNT(*) AS num_ratings
+FROM FACT_RATINGS fr
+JOIN DIM_MOVIES dm ON fr.MOVIE_ID = dm.MOVIE_ID
+GROUP BY dm.GENRE
+ORDER BY num_ratings DESC;
+```
+![graf_5](https://github.com/user-attachments/assets/a59d4c72-78f6-44bb-b7fa-a5231b36654f)
+
+
+**Vysvetlenie:** Tento dotaz poskytuje informácie o popularite jednotlivých žánrov filmov na základe počtu hodnotení. Graf môže zobrazovať, ktoré žánre sú medzi používateľmi najobľúbenejšie.
 
 ---
 
 Grafy vytvorené na základe týchto dotazov vizualizujú dôležité aspekty dát a poskytujú užitočné informácie pre ďalšiu analýzu. **Priložené grafy:**
-
 
 
 
